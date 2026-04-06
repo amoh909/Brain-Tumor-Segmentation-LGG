@@ -1,0 +1,18 @@
+# Virtual environments
+venv/
+.venv/
+.venv*/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Outputs
+outputs/checkpoints/
+
+# Data
+data/raw/
+data/processed/
