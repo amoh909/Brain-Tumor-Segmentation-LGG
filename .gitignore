@@ -12,7 +12,13 @@ __pycache__/
 
 # Outputs
 outputs/checkpoints/
+outputs/predictions/
+outputs/figures/
 
 # Data
 data/raw/
 data/processed/
+
+# OS files
+.DS_Store
+Thumbs.db
