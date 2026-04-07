@@ -17,7 +17,8 @@ outputs/figures/
 
 # Data
 data/raw/
-data/processed/
+data/processed/*
+!data/processed/*.csv
 
 # OS files
 .DS_Store
