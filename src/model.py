@@ -102,7 +102,7 @@ class UNet(nn.Module):
         d2 = torch.cat([d2, e2], dim=1)
         d2 = torch.relu(self.dec_conv2_1(d2))
         d2 = torch.relu(self.dec_conv2_2(d2))
-
+  
         d1 = self.up1(d2)
         d1 = torch.cat([d1, e1], dim=1)
         d1 = torch.relu(self.dec_conv1_1(d1))
