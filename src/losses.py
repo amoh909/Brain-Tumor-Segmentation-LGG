@@ -24,7 +24,7 @@ class DiceLoss(nn.Module):
 
         return 1.0 - dice.mean()
     
-class BCEDiceLoss(nn.Module): ## We use both BCEWithLogitsLoss and DiceLoss to calculate the loss, note that we did not apply sigmoid in the model since the BCEWithLogitsLoss has a sigmoid built into it
+class BCEDiceLoss(nn.Module): ## We use both BCEWithLogitsLoss and DiceLoss as a joint loss function, note that we did not apply sigmoid in the model since BCEWithLogitsLoss applies it internally
     def __init__(self):
         super().__init__()
         self.bce = nn.BCEWithLogitsLoss()
