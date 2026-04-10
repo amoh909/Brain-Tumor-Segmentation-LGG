@@ -14,13 +14,16 @@ class LGGSegmentationDataset(Dataset):
         self.data_info = pd.read_csv(csv_file)
         self.transform = transform
 
-    def len(self):
+    def __len__(self):
         return (len(self.data_info))
 
     def __getitem__(self, idx):
         ## Get file path from csv
         image_path = self.data_info.loc[idx, 'image_path']
         mask_path = self.data_info.loc[idx, 'mask_path']
+
+        image_path = image_path.replace("../", "")
+        mask_path = mask_path.replace("../", "")
 
         # Load image and mask in grayscale
         image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
