@@ -1,5 +1,5 @@
 experiment_id,description,model,augmentation,loss_function,learning_rate,batch_size,epochs,train_loss,val_loss,test_dice,test_iou,checkpoint_file,notes
 E1,Baseline BatchNorm UNet with moderate augmentation,UNet,moderate,BCE+Dice,0.001,8,20,0.8449,0.8416,0.3817,0.3343,best_model_E1.pth,"baseline results"
-E2,No augmentation,UNet,none,BCE+Dice,0.001,8,20,,,,,best_model_no_aug.pth,Compare effect of augmentation
+E2,No augmentation,UNet,none,BCE+Dice,0.001,8,20,0.8055,0.8551,0.3801,0.3365,best_model_E2.pth,Compare effect of augmentation
 E3,BCE only loss,UNet,moderate,BCE,0.001,8,20,,,,,best_model_bce_only.pth,Compare loss functions
 E4,Lower learning rate,UNet,moderate,BCE+Dice,0.0001,8,20,,,,,best_model_lr_1e4.pth,Compare optimization speed/stability
