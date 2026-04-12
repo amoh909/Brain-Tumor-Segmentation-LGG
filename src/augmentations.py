@@ -19,5 +19,5 @@ def get_train_transforms():
     ])
 
 
-def get_val_transforms(): ## We don't do data augmentations on the validation/test sets, this function is added to normalize later
+def get_val_transforms(): 
     return A.Compose([])

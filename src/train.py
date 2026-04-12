@@ -1,6 +1,7 @@
 import os
 import sys
 import torch
+import json
 
 sys.path.append(os.getcwd())
 import config
@@ -84,6 +85,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr = config.LEARNING_RATE)
 
     best_val_loss = float("inf")
+    best_train_loss = float("inf")
     train_losses = []
     val_losses = []
 
@@ -100,16 +102,34 @@ def main():
         print(f"Train Loss: {train_loss:.4f}")
         print(f"Val Loss:   {val_loss:.4f}")
 
+        if train_loss < best_train_loss:
+            best_train_loss = train_loss
+
         # Save best model, assume we overfit, so we still have a checkpoint
         if val_loss < best_val_loss:
             best_val_loss = val_loss
-            checkpoint_path = os.path.join(checkpoints_dir, "best_model.pth")
+            checkpoint_path = os.path.join(checkpoints_dir, f"best_model_{config.EXPERIMENT_ID}.pth")
             torch.save(model.state_dict(), checkpoint_path)
             print(f"Saved best model to {checkpoint_path}")
 
     print("\nTraining complete.")
     print("Train losses:", train_losses)
     print("Val losses:", val_losses)
+
+    history = {
+        "experiment_id": config.EXPERIMENT_ID,
+        "description": "Baseline BatchNorm UNet with moderate augmentation",
+        "train_losses": train_losses,
+        "val_losses": val_losses,
+        "best_train_loss": best_train_loss,
+        "best_val_loss": best_val_loss
+    }
+
+    history_path = os.path.join(checkpoints_dir, f"history_{config.EXPERIMENT_ID}.json")
+    with open(history_path, "w") as f:
+        json.dump(history, f, indent=4)
+    
+    print(f"Saved training history to {history_path}")
 
 
 if __name__ == "__main__":

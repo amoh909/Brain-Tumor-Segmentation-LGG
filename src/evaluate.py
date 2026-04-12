@@ -16,7 +16,8 @@ from src.utils import calculate_metrics, visualize_and_save, predict_mask
 
 
 def main():
-    os.makedirs(config.EVALUATION_DIR, exist_ok=True)
+    evaluation_dir = os.path.join(config.EVALUATION_DIR, config.EXPERIMENT_ID)
+    os.makedirs(evaluation_dir, exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
     
@@ -34,7 +35,7 @@ def main():
     
     # 2. Model Initialization
     model = UNet(in_channels=1, out_channels=1).to(device)
-    checkpoint_path = os.path.join(config.CHECKPOINTS_DIR, "best_model.pth")
+    checkpoint_path = os.path.join(config.CHECKPOINTS_DIR, f"best_model_{config.EXPERIMENT_ID}.pth")
     
     if os.path.exists(checkpoint_path):
         model.load_state_dict(torch.load(checkpoint_path, map_location=device, weights_only=True))
@@ -91,7 +92,7 @@ def main():
     
     # Save aggregate results
     results_df = pd.DataFrame(results)
-    results_csv_path = os.path.join(config.EVALUATION_DIR, "detailed_results.csv")
+    results_csv_path = os.path.join(evaluation_dir, "detailed_results.csv")
     results_df.to_csv(results_csv_path, index=False)
     
     summary = {
@@ -100,11 +101,11 @@ def main():
         'average_dice': avg_dice,
         'average_iou': avg_iou
     }
-    summary_path = os.path.join(config.EVALUATION_DIR, "summary.json")
+    summary_path = os.path.join(evaluation_dir, "summary.json")
     with open(summary_path, 'w') as f:
         json.dump(summary, f, indent=4)
     
-    print(f"\nEvaluation Results Saved to: {config.EVALUATION_DIR}")
+    print(f"\nEvaluation Results Saved to: {evaluation_dir}")
     print(f"Total Samples: {num_samples}")
     print(f"Average Test Loss:  {avg_loss:.4f}")
     print(f"Average Dice Score: {avg_dice:.4f}")
@@ -135,7 +136,7 @@ def main():
                 mask_pred = predict_mask(outputs).cpu().squeeze(0)
                 
             save_name = f"{prefix}_{rank+1}_dice_{dice:.4f}.png"
-            save_path = os.path.join(config.EVALUATION_DIR, save_name)
+            save_path = os.path.join(evaluation_dir, save_name)
             
             visualize_and_save(
                 image, mask_true, mask_pred, 
@@ -149,7 +150,7 @@ def main():
         if unique_best:
             process_and_visualize(unique_best, "best")
 
-    print(f"Visualizations saved to {config.EVALUATION_DIR}/")
+    print(f"Visualizations saved to {evaluation_dir}/")
 
 if __name__ == "__main__":
     main()
