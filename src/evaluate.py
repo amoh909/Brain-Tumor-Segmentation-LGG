@@ -11,7 +11,7 @@ import src.config as config
 from src.dataset import LGGSegmentationDataset
 from src.augmentations import get_val_transforms
 from src.model import UNet
-from src.losses import BCEDiceLoss
+from src.losses import get_loss_function
 from src.utils import calculate_metrics, visualize_and_save, predict_mask
 
 
@@ -44,7 +44,7 @@ def main():
         print(f"WARNING: No checkpoint found at {checkpoint_path}! Using untrained model.")
         
     model.eval()
-    loss_fn = BCEDiceLoss()
+    loss_fn = get_loss_function(config.LOSS_TYPE)
     
     # 3. Evaluation Loop & Tracking
     results = [] # To store dicts of index, dice, iou

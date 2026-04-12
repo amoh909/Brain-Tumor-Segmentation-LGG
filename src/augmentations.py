@@ -16,7 +16,6 @@ def get_train_transforms():
             contrast_limit=0.2,
             p=0.3
         ),
-        A.GaussNoise(p=0.2),
     ])
 
 

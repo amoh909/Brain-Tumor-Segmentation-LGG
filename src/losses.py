@@ -34,3 +34,14 @@ class BCEDiceLoss(nn.Module): ## We use both BCEWithLogitsLoss and DiceLoss as a
         bce_loss = self.bce(pred, target)
         dice_loss = self.dice(pred, target)
         return bce_loss + dice_loss
+    
+def get_loss_function(loss_type):
+    loss_type = loss_type.lower()
+    if loss_type == "bce":
+        return nn.BCEWithLogitsLoss()
+    elif loss_type == "dice":
+        return DiceLoss()
+    elif loss_type == "bce_dice":
+        return BCEDiceLoss()
+    else:
+        print("Unsupported loss function, please use bce, dice, or bce_dice")
