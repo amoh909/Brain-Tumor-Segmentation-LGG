@@ -11,7 +11,6 @@ from tqdm import tqdm
 from src.dataset import LGGSegmentationDataset
 from src.augmentations import get_train_transforms, get_val_transforms
 from src.model import UNet
-from src.modeplain import UNetplain
 from src.losses import get_loss_function
 
 def train_one_epoch(model, dataloader, optimizer, loss_fn, device):
@@ -81,7 +80,7 @@ def main():
         shuffle = False
     )
 
-    model = UNetplain(in_channels=1, out_channels=1).to(device)
+    model = UNet(in_channels=1, out_channels=1).to(device)
     loss_fn = get_loss_function(config.LOSS_TYPE)
     optimizer = torch.optim.Adam(model.parameters(), lr = config.LEARNING_RATE)
 
