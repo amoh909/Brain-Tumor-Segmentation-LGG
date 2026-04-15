@@ -2,8 +2,8 @@ IMAGE_SIZE = 256
 BATCH_SIZE = 8
 LEARNING_RATE = 1e-4
 NUM_EPOCHS = 20
-EXPERIMENT_ID = "E6"
-LOSS_TYPE = "bce"   # "bce" or "dice" or "bce_dice"
+EXPERIMENT_ID = "E9"
+LOSS_TYPE = "dice"   # "bce" or "dice" or "bce_dice"
 
 TRAIN_CSV = "data/processed/train.csv"
 VAL_CSV = "data/processed/val.csv"

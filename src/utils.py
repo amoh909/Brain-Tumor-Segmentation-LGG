@@ -1,7 +1,7 @@
 import torch
 import matplotlib.pyplot as plt
 
-def calculate_metrics(pred, target, smooth=1e-6):
+def calculate_metrics(pred, target, smooth=1.0):
 
     intersection = (pred * target).sum()
     union = pred.sum() + target.sum()

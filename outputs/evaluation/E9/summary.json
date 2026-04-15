@@ -1,0 +1,6 @@
+{
+    "total_samples": 561,
+    "average_loss": 0.7598382057140642,
+    "average_dice": 0.34925676265370426,
+    "average_iou": 0.3032338253161072
+}
