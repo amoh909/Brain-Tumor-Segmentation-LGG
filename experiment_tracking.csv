@@ -8,3 +8,4 @@ E6,Lower learning rate,UNet,moderate,BCE,0.0001,8,20,0.0121,0.0180,0.8179,0.7814
 E7,Middle ground learning rate,UNet,moderate,BCE,0.0005,8,20,0.0151,0.0236,0.7565,0.7197,best_model_E7.pth,Compare optimization speed/stability (switched to BCE alone because it turned out to be the best),worse than the lower lr
 E8,Plain UNet,UNetplain,moderate,BCE,0.0001,8,20,0.0315,0.0385,0.6392,0.6263,best_model_E8.pth,Compare different architectures (switched to BCE alone because it turned out to be the best),worse than the BatchNorm model
 E9,smoothing factor with Dice loss,UNet,moderate,Dice,0.0001,8,20,0.7835,0.7721,0.3493,0.3032,best_model_E9.pth,Test 1 smoothing factor w dice loss,Improved over E5 but much worse than BCE
+E10,Attention UNet with BCE loss,AttentionUNet,moderate,BCE,0.0001,8,20,0.0116,0.0212,0.7755,0.7359,best_model_E10.pth,Testing Attention U-Net architecture,Second best performing model confirming BCE is a very strong loss formulation for this dataset.

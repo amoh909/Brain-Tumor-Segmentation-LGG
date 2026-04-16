@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from src.dataset import LGGSegmentationDataset
 from src.augmentations import get_train_transforms, get_val_transforms
-from src.model import UNet
+from src.model import get_model
 from src.losses import get_loss_function
 
 def train_one_epoch(model, dataloader, optimizer, loss_fn, device):
@@ -80,7 +80,7 @@ def main():
         shuffle = False
     )
 
-    model = UNet(in_channels=1, out_channels=1).to(device)
+    model = get_model(config.MODEL_TYPE, in_channels=1, out_channels=1).to(device)
     loss_fn = get_loss_function(config.LOSS_TYPE)
     optimizer = torch.optim.Adam(model.parameters(), lr = config.LEARNING_RATE)
 
@@ -118,7 +118,7 @@ def main():
 
     history = {
         "experiment_id": config.EXPERIMENT_ID,
-        "description": "Baseline UNet with moderate augmentation",
+        "description": f"{config.MODEL_TYPE} with moderate augmentation",
         "train_losses": train_losses,
         "val_losses": val_losses,
         "best_train_loss": best_train_loss,

@@ -10,7 +10,7 @@ sys.path.append(os.getcwd())
 import src.config as config
 from src.dataset import LGGSegmentationDataset
 from src.augmentations import get_val_transforms
-from src.model import UNet
+from src.model import get_model
 from src.losses import get_loss_function
 from src.utils import calculate_metrics, visualize_and_save, predict_mask
 
@@ -34,7 +34,7 @@ def main():
     )
     
     # 2. Model Initialization
-    model = UNet(in_channels=1, out_channels=1).to(device)
+    model = get_model(config.MODEL_TYPE, in_channels=1, out_channels=1).to(device)
     checkpoint_path = os.path.join(config.CHECKPOINTS_DIR, f"best_model_{config.EXPERIMENT_ID}.pth")
     
     if os.path.exists(checkpoint_path):
