@@ -30,7 +30,8 @@ def main():
     test_loader = DataLoader(
         test_dataset,
         batch_size=1, # Evaluate 1 by 1 for accurate instance tracking
-        shuffle=False
+        shuffle=False,
+        num_workers=0
     )
     
     # Model Initialization
@@ -76,11 +77,11 @@ def main():
             
             # Save metrics
             results.append({
-            'index': i,
-            'patient_id': test_dataset.data_info.loc[i, 'patient_id'],  # ✅ ADD THIS
-            'image_path': test_dataset.data_info.loc[i, 'image_path'],
-            'dice': dice,
-            'iou': iou,
+                'index': i,
+                'patient_id': test_dataset.data_info.loc[i, 'patient_id'], 
+                'image_path': test_dataset.data_info.loc[i, 'image_path'],
+                'dice': dice,
+                'iou': iou,
             })
             
             loop.set_postfix(dice=f"{dice:.4f}")
