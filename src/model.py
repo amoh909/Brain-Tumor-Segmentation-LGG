@@ -126,6 +126,7 @@ class UNet(nn.Module):
         d1 = torch.relu(self.dec_bn1_2(self.dec_conv1_2(d1)))
 
         # Final Output
+        out = self.final_conv(d1)
         return out
 
 class AttentionBlock(nn.Module):

@@ -1,6 +1,8 @@
 {
     "total_samples": 561,
     "average_loss": 0.02318141096528477,
-    "average_dice": 0.8179236446841588,
-    "average_iou": 0.7813768169934597
+    "average_dice": 0.8190073791344848,
+    "average_iou": 0.7825040670378742,
+    "num_patients": 17,
+    "dice_std_across_patients": 0.12050831282681367
 }

@@ -21,7 +21,7 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
     
-    # 1. Dataset and DataLoader
+    # Dataset and DataLoader
     test_dataset = LGGSegmentationDataset(
         csv_file=config.TEST_CSV,
         transform=get_val_transforms()
@@ -33,7 +33,7 @@ def main():
         shuffle=False
     )
     
-    # 2. Model Initialization
+    # Model Initialization
     model = get_model(config.MODEL_TYPE, in_channels=1, out_channels=1).to(device)
     checkpoint_path = os.path.join(config.CHECKPOINTS_DIR, f"best_model_{config.EXPERIMENT_ID}.pth")
     
@@ -46,7 +46,7 @@ def main():
     model.eval()
     loss_fn = get_loss_function(config.LOSS_TYPE)
     
-    # 3. Evaluation Loop & Tracking
+    # Evaluation Loop & Tracking
     results = [] # To store dicts of index, dice, iou
     total_dice = 0.0
     total_iou = 0.0
@@ -76,10 +76,11 @@ def main():
             
             # Save metrics
             results.append({
-                'index': i,
-                'image_path': test_dataset.data_info.loc[i, 'image_path'],
-                'dice': dice,
-                'iou': iou,
+            'index': i,
+            'patient_id': test_dataset.data_info.loc[i, 'patient_id'],  # ✅ ADD THIS
+            'image_path': test_dataset.data_info.loc[i, 'image_path'],
+            'dice': dice,
+            'iou': iou,
             })
             
             loop.set_postfix(dice=f"{dice:.4f}")
@@ -94,12 +95,36 @@ def main():
     results_df = pd.DataFrame(results)
     results_csv_path = os.path.join(evaluation_dir, "detailed_results.csv")
     results_df.to_csv(results_csv_path, index=False)
+
+
+    patient_stats = results_df.groupby("patient_id").agg({
+         "dice": "mean",
+          "iou": "mean"
+    }).reset_index()
+
+    best_patients = patient_stats.sort_values(by="dice", ascending=False)
+    worst_patients = patient_stats.sort_values(by="dice", ascending=True)
+
+    print("\nTop 5 best patients:")
+    print(best_patients.head())
+
+    print("\nTop 5 worst patients:")
+    print(worst_patients.head())
+
+    patient_csv_path = os.path.join(evaluation_dir, "patient_results.csv")
+    patient_stats.to_csv(patient_csv_path, index=False)
+
+    std_dice = patient_stats["dice"].std()
+    print(f"Dice standard deviation across patients: {std_dice:.4f}")
+
     
     summary = {
         'total_samples': num_samples,
         'average_loss': avg_loss,
         'average_dice': avg_dice,
-        'average_iou': avg_iou
+        'average_iou': avg_iou,
+        'num_patients': len(patient_stats),
+        'dice_std_across_patients': float(std_dice),
     }
     summary_path = os.path.join(evaluation_dir, "summary.json")
     with open(summary_path, 'w') as f:
@@ -111,7 +136,7 @@ def main():
     print(f"Average Dice Score: {avg_dice:.4f}")
     print(f"Average IoU Score:  {avg_iou:.4f}\n")
     
-    # 4. Best and Worst Predictions
+    # Best and Worst Predictions
     # Sort results by Dice score ascending
     results.sort(key=lambda x: x['dice'])
     
