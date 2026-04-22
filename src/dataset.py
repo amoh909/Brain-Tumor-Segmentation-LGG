@@ -15,7 +15,7 @@ class LGGSegmentationDataset(Dataset):
         self.transform = transform
 
     def __len__(self):
-        return (len(self.data_info))
+        return len(self.data_info)
 
     def __getitem__(self, idx):
         ## Get file path from csv
@@ -50,7 +50,7 @@ class LGGSegmentationDataset(Dataset):
         mask = np.expand_dims(mask, axis=0)
 
         # Convert from NumPy arrays to tensors for PyTorch
-        image = torch.tensor(image, dtype=torch.float32)
-        mask = torch.tensor(mask, dtype=torch.float32)
+        image = torch.from_numpy(image).float()
+        mask = torch.from_numpy(mask).float()
 
         return image, mask

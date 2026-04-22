@@ -24,7 +24,7 @@ class DiceLoss(nn.Module):
 
         return 1.0 - dice.mean()
     
-class BCEDiceLoss(nn.Module): ## We use both BCEWithLogitsLoss and DiceLoss as a joint loss function, note that we did not apply sigmoid in the model since BCEWithLogitsLoss applies it internally
+class BCEDiceLoss(nn.Module): ## BCEWithLogitsLoss and DiceLoss as a joint loss function, note that we did not apply sigmoid in the model since BCEWithLogitsLoss applies it internally
     def __init__(self):
         super().__init__()
         self.bce = nn.BCEWithLogitsLoss()
@@ -44,4 +44,4 @@ def get_loss_function(loss_type):
     elif loss_type == "bce_dice":
         return BCEDiceLoss()
     else:
-        print("Unsupported loss function, please use bce, dice, or bce_dice")
+        raise ValueError("Unsupported loss function. Use 'bce', 'dice', or 'bce_dice'")

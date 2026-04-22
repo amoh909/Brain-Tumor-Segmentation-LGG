@@ -50,9 +50,9 @@ def validate_one_epoch(model, dataloader, loss_fn, device):
     return loss / len(dataloader)
 
 def main():
-    train_csv = "data/processed/train.csv"
-    validate_csv = "data/processed/val.csv"
-    checkpoints_dir = "outputs/checkpoints"
+    train_csv = config.TRAIN_CSV
+    validate_csv = config.VAL_CSV
+    checkpoints_dir = config.CHECKPOINTS_DIR
     os.makedirs(checkpoints_dir, exist_ok = True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -71,13 +71,15 @@ def main():
     train_loader = DataLoader(
         train_dataset,
         batch_size = config.BATCH_SIZE,
-        shuffle = True
+        shuffle = True,
+        num_workers=0
     )
 
     val_loader = DataLoader(
         val_dataset,
         batch_size = config.BATCH_SIZE,
-        shuffle = False
+        shuffle = False,
+        num_workers=0
     )
 
     model = get_model(config.MODEL_TYPE, in_channels=1, out_channels=1).to(device)
@@ -118,7 +120,7 @@ def main():
 
     history = {
         "experiment_id": config.EXPERIMENT_ID,
-        "description": f"{config.MODEL_TYPE} with moderate augmentation",
+        "description": f"{config.MODEL_TYPE}, loss={config.LOSS_TYPE}, lr={config.LEARNING_RATE}",
         "train_losses": train_losses,
         "val_losses": val_losses,
         "best_train_loss": best_train_loss,
