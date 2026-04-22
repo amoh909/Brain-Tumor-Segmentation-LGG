@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import numpy as np
 import pandas as pd
@@ -13,6 +15,7 @@ class LGGSegmentationDataset(Dataset):
         """    
         self.data_info = pd.read_csv(csv_file)
         self.transform = transform
+        self.base_dir = os.path.dirname(os.path.abspath(csv_file))
 
     def __len__(self):
         return len(self.data_info)
@@ -22,8 +25,8 @@ class LGGSegmentationDataset(Dataset):
         image_path = self.data_info.loc[idx, 'image_path']
         mask_path = self.data_info.loc[idx, 'mask_path']
 
-        image_path = image_path.replace("../", "")
-        mask_path = mask_path.replace("../", "")
+        image_path = os.path.normpath(os.path.join(self.base_dir, image_path))
+        mask_path  = os.path.normpath(os.path.join(self.base_dir, mask_path))
 
         # Load image and mask in grayscale
         image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
