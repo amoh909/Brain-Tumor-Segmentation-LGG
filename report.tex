@@ -1,0 +1,181 @@
+\documentclass[12pt]{article}
+
+% ----------------- Packages -----------------
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{setspace}
+\setstretch{1.19}
+\usepackage{float}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{cite}
+\usepackage{booktabs}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black
+}
+
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{0.5em}{}
+
+\setlength{\parindent}{0.5in}
+
+% ----------------- Document -----------------
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \includegraphics[width=10cm]{Faculty_logo}\\[1.5cm]
+
+    {\LARGE \textbf{Brain Tumor Segmentation (LGG MRI)}\\[1cm]}
+
+    {\large Submitted by}\\[0.2cm]
+    {\large Ali Mohsen (amm117@mail.aub.edu)}\\
+    {\large Yasmine Ghriss (yag05@mail.aub.edu)}\\
+    {\large Ahmad Al Rabia (aza29@mail.aub.edu)}\\
+    {\large Nadjib Tebbal (nst11@mail.aub.edu)}\\[1cm]
+    
+    {\large Submitted in fulfillment of the requirements for the course project}\\[0.2cm]
+    {\large \textbf{CMPS 261: Machine Learning}}\\[0.5cm]
+
+    {\large Instructors:}\\
+    {\large Dr.~M. Kobeissi \& Dr.~H. Harkous}\\[1cm]
+
+    {\large April 2026}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ------------- Sections -------------
+\section{Introduction}
+Brain tumor segmentation is a crucial task for precise diagnosis and disease monitoring in medical imaging. It works by isolating tumor tissues from healthy brain tissues in MRI scans. The variability in tumor sizes, shapes, and locations makes this task challenging. In this project, our objective is twofold: first, segment tumors from MRI images by applying various deep learning methods; and second, analyze how different learning choices affect the model's performance.
+
+\section{Dataset \& Preprocessing}
+The dataset used in this study is obtained from the following Kaggle repository: 
+\url{https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation/data}. The dataset comprises 3,929 2D MRI slices and corresponding tumor masks, grouped by 110 patients. \\
+
+To ensure the model generalizes to unseen individuals and to prevent data leakage, we split the data in a patient-wise manner. This split ensures that slices from a single patient appear in only one set. We summarize the distribution of the data below:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llll}
+\toprule
+\textbf{Set}        & \textbf{Patients} & \textbf{Images} & \textbf{\% of Images} \\ \midrule
+\textbf{Training}   & 77                & 2,750           & 69.99\%               \\ \addlinespace
+\textbf{Validation} & 16                & 618             & 15.73\%               \\ \addlinespace
+\textbf{Testing}    & 17                & 561             & 14.28\%               \\ \midrule
+\textbf{Total}      & \textbf{110}      & \textbf{3,929}  & \textbf{100\%}        \\ \bottomrule
+\end{tabular}
+\caption{Dataset split distribution across training, validation, and testing sets}
+\label{tab:dataset_split}
+\end{table}
+
+\section{Methodology}
+
+\subsection{Model}
+In this project, we utilize the U-Net Architecture as the primary framework. We explored three specific variations of the U-Net model:
+\begin{itemize}
+    \item \textbf{Baseline U-Net} A standard U-Net architecture used as a starting point. 
+    \item \textbf{U-Net with Batch Normalization (NormBatch)} An improved version of the baseline U-Net, where Batch Normalization layers are added after convolutional layers.
+    \item \textbf{Attention U-Net} An extension of U-Net that uses attention mechanisms to focus more on important regions in the image.
+\end{itemize}
+
+\subsection{Training Setup}
+We trained the models for 20 epochs using the ADAM optimizers with a batch size of 8. Additionally, we tried different learning rates (1e-3, 1e-4, 5e-4), and different loss functions:
+\begin{align}
+\mathcal{L}_{\text{BCE}} &= - \frac{1}{N} \sum_{i=1}^{N} \left[ y_i \log(\sigma(x_i)) + (1 - y_i)\log(1 - \sigma(x_i)) \right] 
+\quad \mathcal{L}_{\text{BCE}} \geq 0 \\
+\mathcal{L}_{\text{Dice}} &= 1 - \frac{2 \sum_{i} p_i y_i + \epsilon}{\sum_{i} p_i + \sum_{i} y_i + \epsilon} 
+\quad 0 \leq \mathcal{L}_{\text{Dice}} \leq 1 \\
+\mathcal{L}_{\text{BCE+Dice}} &= \mathcal{L}_{\text{BCE}} + \mathcal{L}_{\text{Dice}} 
+\quad \mathcal{L}_{\text{BCE+Dice}} \geq 0
+\end{align}
+
+\noindent where $p_i$ denotes the predicted value for pixel $i$ (after applying the sigmoid function), $y_i$ is the ground truth label for pixel $i$, and $\epsilon$ is a small constant added for numerical stability to avoid division by zero.\\
+
+\subsection{Data Augmentation}
+We applied data augmentations at different intensities to assess the effect of these augmentations on our model's ability to generalize over new unseen data. A moderate augmentation pipeline was used as a baseline, consisting of flips, affine transformations, and brightness and contrast adjustments.
+
+\begin{lstlisting}[language=Python, caption=Moderate augmentation pipeline]
+A.HorizontalFlip(p=0.5),
+A.VerticalFlip(p=0.5),
+A.Affine(translate_percent=0.06, scale=(0.9, 1.1), rotate=(-20, 20), p=0.5),
+A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.3),
+\end{lstlisting}
+
+\section{Experiments \& Results}
+We conducted several experiments to evaluate the effects of augmentation, loss functions, learning rates, and model architectures. Below is the summary of the experiments:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\textbf{Exp} & \textbf{Model} & \textbf{Aug} & \textbf{LR} & \textbf{Loss} & \textbf{Dice} & \textbf{IoU} \\
+\hline
+E1 & U-Net (BN) & Moderate & 1e-3 & BCE+Dice & 0.3817 & 0.3343 \\
+E2 & U-Net (BN) & None & 1e-3 & BCE+Dice & 0.3801 & 0.3365 \\
+E3 & U-Net (BN) & Strong & 1e-3 & BCE+Dice & 0.2516 & 0.2097 \\
+E4 & U-Net (BN) & Moderate & 1e-3 & BCE & 0.6827 & 0.6514 \\
+E5 & U-Net (BN) & Moderate & 1e-3 & Dice & 0.2293 & 0.1867 \\
+E6 & U-Net (BN) & Moderate & 1e-4 & BCE & \textbf{0.8179} & \textbf{0.7814} \\
+E7 & U-Net (BN) & Moderate & 5e-4 & BCE & 0.7565 & 0.7197 \\
+E8 & U-Net (Plain) & Moderate & 1e-4 & BCE & 0.6392 & 0.6263 \\
+E9 & U-Net (BN) & Moderate & 1e-4 & Dice & 0.3493 & 0.3032 \\
+E10 & Attention U-Net & Moderate & 1e-4 & BCE & 0.7755 & 0.7359 \\
+\hline
+\end{tabular}
+\caption{Summary of experiments with different configurations and their performance}
+\label{tab:results}
+\end{table}
+
+Results show that strong augmentation, which adds Gaussian Noise, significantly reduces performance; moderate augmentation did not significantly affect performance. We proceed with our experiments using moderate augmentation\\
+
+However, the loss function choice had the largest effect. Binary Cross-Entropy (BCE) significantly outperformed both Dice-based and BCE+Dice-based losses, improving Dice score up to 0.68. Further improvements were achieved by tuning the learning rate. Reducing the learning rate to 1e-4 resulted in the best performance, achieving a Dice score of 0.8179. We tried with a middle-ground learning rate such as 5e-4, but performed worse than 1e-4, but better than 1e-3. 1e-4 proved to be a good learning rate that increased the Dice score and ensured convergence in a reasonable time.\\
+
+Architectural changes such as using U-Net by removing the batch normalization, or using Attention U-Net did not outperform the optimized baseline model. \\
+
+After completing the main set of experiments, additional configurations were explored, including longer training durations and alternative architectures. These experiments resulted in a slight improvement in performance, with the best configuration achieving a Dice score of approximately 0.82 (This configuration increased the number of epochs to 35). This suggests that while further fine-tuning can yield marginal gains, the primary performance improvements are driven by the key design choices identified earlier. The detailed results of these additional experiments are provided in the accompanying artifact (\texttt{experimentstracking.csv}).
+
+\section{Evaluation \& Generalization}
+
+To evaluate our models, we used two metrics: Dice Coefficient, and Intersection over Union (IoU). These two metrics are defined as:
+
+\begin{align}
+\text{Dice} &= \frac{2 \sum_{i} p_i y_i + \epsilon}{\sum_{i} p_i + \sum_{i} y_i + \epsilon}
+\quad 0 \leq \text{Dice} \leq 1 \\
+\text{IoU} &= \frac{\sum_{i} p_i y_i + \epsilon}{\sum_{i} p_i + \sum_{i} y_i - \sum_{i} p_i y_i + \epsilon}
+\quad 0 \leq \text{IoU} \leq 1
+\end{align}
+
+The best-performing model (E6) achieved a Dice score of 0.8179 and an IoU score of 0.7814, indicating strong segmentation performance.
+
+To assess generalization, we evaluated performance at the patient level. Dice scores ranged from 0.51 to 0.97, with a mean of 0.8234, which is very close to the overall test Dice score (0.8179). This close agreement indicates that the model generalizes well to unseen data and is not biased toward patients with a larger number of slices.
+
+The standard deviation of 0.1205 indicates moderate variability, which is expected due to differences in tumor characteristics, while still reflecting stable and reliable performance across the dataset. Additionally, the consistency between test-level and patient-level performance provides evidence that the model is not overfitting, as it does not exhibit a significant drop in performance on unseen data. The relatively high Dice score further suggests that the model is not underfitting.
+
+\section{Conclusion}
+
+In this project, we investigated the use of deep learning models for brain tumor segmentation on MRI data. We analyzed the impact of different design choices, including data augmentation, loss functions, learning rates, and model architectures.
+
+Our results showed that optimization choices had the greatest effect on performance. In particular, Binary Cross-Entropy (BCE) loss consistently outperformed Dice-based losses, and reducing the learning rate to $10^{-4}$ led to the best results. More complex architectures, such as Attention U-Net, did not outperform the simpler U-Net when properly optimized.
+
+The final model achieved a Dice score of 0.8179, demonstrating strong segmentation performance. Additionally, the close agreement between slice-level and patient-level Dice scores indicates stable performance across different patients, confirming good generalization.
+
+Overall, this study highlights the importance of careful optimization and hyperparameter tuning, which could provide greater benefits than increasing model complexity in some cases.
+
+\section{Reproducibility and Code Availability}
+
+The full implementation of this project, including training, evaluation, and experiment tracking, is available at:
+
+\url{https://github.com/amoh909/Brain-Tumor-Segmentation-LGG}
+
+The repository contains all necessary scripts and instructions to reproduce the results presented in this report. It also includes a notebook named ``brain\_tumor\_segmentation.ipynb'', which highlights the key components of the project and provides visualizations and comparisons of the results.
+
+\end{document}
