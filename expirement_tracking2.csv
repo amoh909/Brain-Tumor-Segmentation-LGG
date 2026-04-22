@@ -1,0 +1,7 @@
+experiment_id,model_type,loss_type,learning_rate,batch_size,epochs,average_test_loss,average_dice,average_iou,status,rank_by_dice,comparison_to_e6,notes
+E11,unet,bce,0.0001,8,35,0.016820953192613494,0.8209328166715081,0.7811829949313701,completed,1,better_dice_near_tied_iou,Current best result
+E12,residual_unet,bce,0.0001,8,20,0.023644545365377276,0.7710255653574691,0.7365204968603113,completed,4,worse,Residual UNet underperformed baseline
+E13,unet,tversky,0.0001,8,20,,,,not_run,,not_evaluated,Config created but no evaluation artifacts present
+E14,unet++,bce,0.0001,8,20,0.025187324396784477,0.7770753241124251,0.7410817878753116,completed,3,worse,UNet++ underperformed baseline
+E15,r2unet,bce,0.0001,8,20,0.04375420289164751,0.4383194213251126,0.42212633900804014,completed,5,much_worse,R2U-Net failed badly under this setup
+E16,unet,bce,0.00005,8,40,0.026260981893410935,0.7925926648310586,0.7626152388595767,completed,2,worse,Lower learning rate plus longer training did not beat E6 or E11
